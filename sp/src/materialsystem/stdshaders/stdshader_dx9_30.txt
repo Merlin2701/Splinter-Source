@@ -30,9 +30,7 @@ SDK_depthwrite_vs20.fxc
 
 SDK_eyes_ps2x.fxc
 SDK_eyes_vs20.fxc
-SDK_eye_refract_ps2x.fxc
-SDK_eye_refract_vs20.fxc
-SDK_eyes_flashlight_ps2x.fxc
+SDK_eye_refract_ps2x.fxclight_ps2x.fxc
 SDK_eyes_flashlight_vs20.fxc
 
 SDK_teeth_ps2x.fxc
@@ -47,3 +45,11 @@ SDK_decalmodulate_vs20.fxc
 
 pbr_ps30.fxc
 pbr_vs30.fxc
+
+ssao_combine_ps30.fxc
+ssao_ps30.fxc
+ssao_blur_ps30.fxc
+
+screenspace_simple_vs30.fxc
+
+ssgi_ps30.fxc

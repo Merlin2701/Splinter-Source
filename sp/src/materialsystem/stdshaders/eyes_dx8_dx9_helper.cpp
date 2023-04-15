@@ -11,7 +11,7 @@
 #include "cpp_shader_constant_register_map.h"
 #include "SDK_Eyes.inc"
 #include "SDK_eyes_flashlight_vs11.inc"
-#include "SDK_eyes_flashlight_ps11.inc"
+//#include "SDK_eyes_flashlight_ps11.inc"
 
 #ifdef STDSHADER_DX9_DLL_EXPORT
 
@@ -187,8 +187,8 @@ static void DrawFlashlight( bool bDX9, CBaseVSShader *pShader, IMaterialVar** pa
 			sdk_eyes_flashlight_vs11_Static_Index	vshIndex;
 			pShaderShadow->SetVertexShader( "sdk_eyes_flashlight_vs11", vshIndex.GetIndex() );
 
-			sdk_eyes_flashlight_ps11_Static_Index	pshIndex;
-			pShaderShadow->SetPixelShader( "sdk_eyes_flashlight_ps11", pshIndex.GetIndex() );
+			//sdk_eyes_flashlight_ps11_Static_Index	pshIndex;
+			//pShaderShadow->SetPixelShader( "sdk_eyes_flashlight_ps11", pshIndex.GetIndex() );
 		}
 		
 		pShader->FogToBlack();
@@ -301,8 +301,8 @@ static void DrawFlashlight( bool bDX9, CBaseVSShader *pShader, IMaterialVar** pa
 			vshIndex.SetSKINNING( pShaderAPI->GetCurrentNumBones() > 0 );
 			pShaderAPI->SetVertexShaderIndex( vshIndex.GetIndex() );
 
-			sdk_eyes_flashlight_ps11_Dynamic_Index pshIndex;
-			pShaderAPI->SetPixelShaderIndex( pshIndex.GetIndex() );
+			//sdk_eyes_flashlight_ps11_Dynamic_Index pshIndex;
+		//	pShaderAPI->SetPixelShaderIndex( pshIndex.GetIndex() );
 		}
 
 		// This uses from VERTEX_SHADER_SHADER_SPECIFIC_CONST_0 to VERTEX_SHADER_SHADER_SPECIFIC_CONST_5

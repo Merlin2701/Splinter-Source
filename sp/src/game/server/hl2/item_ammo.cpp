@@ -318,7 +318,7 @@ public:
 		SetModel( "models/items/357ammo.mdl");
 		BaseClass::Spawn( );
 	}
-
+	
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_357, "357"))
@@ -584,6 +584,7 @@ LINK_ENTITY_TO_CLASS(item_box_sniper_rounds, CItem_BoxSniperRounds);
 class CItem_BoxBuckshot : public CItem
 {
 public:
+
 	DECLARE_CLASS( CItem_BoxBuckshot, CItem );
 
 	void Spawn( void )
@@ -596,18 +597,48 @@ public:
 	{
 		PrecacheModel ("models/items/boxbuckshot.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+
+	COutputEvent	m_OnUsed2;
+	CHandle< CBasePlayer > m_hActivator2;
+
+	void use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 	{
-		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_BUCKSHOT, "Buckshot"))
-		{
-			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
-			{
-				UTIL_Remove(this);	
-			}
-			return true;
-		}
-		return false;
+
+		BaseClass::Use(pActivator, pCaller, useType, value);
+		CBasePlayer* pPlayer = dynamic_cast<CBasePlayer*>(pActivator);
+
+
+
+
+
+
+		if (pPlayer == NULL)
+			return;
+
+		m_OnUsed2.FireOutput(pActivator, this);
+
+		 m_hActivator2 = pPlayer;
+		
+		 
+		 
+			 if (ITEM_GiveAmmo(pPlayer, SIZE_AMMO_BUCKSHOT, "Buckshot"))
+			 {
+				 if (g_pGameRules->ItemShouldRespawn(this) == GR_ITEM_RESPAWN_NO)
+				 {
+					 UTIL_Remove(this);
+				 }
+				 
+			 }
+		
+		 
+
+
+		 
+
 	}
+
+
+
 };
 LINK_ENTITY_TO_CLASS(item_box_buckshot, CItem_BoxBuckshot);
 

@@ -928,17 +928,37 @@ void CBaseCombatWeapon::MakeTracer( const Vector &vecTracerSrc, const trace_t &t
 	}
 }
 
-void CBaseCombatWeapon::GiveTo( CBaseEntity *pOther )
+/*void CBaseCombatWeapon::GiveTo( CBaseEntity *pOther )
 {
 	DefaultTouch( pOther );
 }
+*/
+void CBaseCombatWeapon::GiveTo(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+{
+	CBasePlayer* pPlayer = ToBasePlayer(pActivator);
 
+	if (pPlayer)
+	{
+		DefaultTouch(pPlayer);
+	}
+}
+
+/*void CItem::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+{
+	CBasePlayer* pPlayer = ToBasePlayer(pActivator);
+
+	if (pPlayer)
+	{
+		ItemTouch(pPlayer);
+	}
+}
+*/
 //-----------------------------------------------------------------------------
 // Purpose: Default Touch function for player picking up a weapon (not AI)
 // Input  : pOther - the entity that touched me
 // Output :
 //-----------------------------------------------------------------------------
-void CBaseCombatWeapon::DefaultTouch( CBaseEntity *pOther )
+void CBaseCombatWeapon::DefaultTouch(CBaseEntity* pOther)
 {
 #if !defined( CLIENT_DLL )
 	// Can't pick up dissolving weapons
@@ -957,7 +977,7 @@ void CBaseCombatWeapon::DefaultTouch( CBaseEntity *pOther )
 		// the player WILL end up taking the object, but cache interactions
 		// are fired as soon as you prove you have found the object, not
 		// when you finally acquire it.
-		m_OnCacheInteraction.FireOutput( pOther, this );
+		m_OnCacheInteraction.FireOutput(pOther, this );
 	}
 
 	if( HasSpawnFlags(SF_WEAPON_NO_PLAYER_PICKUP) )
@@ -1068,7 +1088,7 @@ void CBaseCombatWeapon::RescindReloadHudHint()
 void CBaseCombatWeapon::SetPickupTouch( void )
 {
 #if !defined( CLIENT_DLL )
-	SetTouch(&CBaseCombatWeapon::DefaultTouch);
+	//SetTouch(&CBaseCombatWeapon::DefaultTouch);
 
 	if ( gpGlobals->maxClients > 1 )
 	{

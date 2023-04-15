@@ -1,0 +1,14 @@
+//
+// vs 3.0   ps 3.0   shaders collection
+//
+//  These shaders are forced to compile as shader model 3.0
+//  using the new compiler.
+//	    _ps30.vcs
+//	    _vs30.vcs
+//
+
+ssao_ps30.fxc
+ssao_blur_ps30.fxc
+ssao_combine_ps30.fxc
+pbr_vs30.fxc
+pbr_ps30.fxc

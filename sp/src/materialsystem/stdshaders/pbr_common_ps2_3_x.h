@@ -9,16 +9,25 @@ static const float PI = 3.141592;
 static const float ONE_OVER_PI = 0.318309;
 static const float EPSILON = 0.00001;
 
+
 // Shlick's approximation of the Fresnel factor
 float3 fresnelSchlick(float3 F0, float cosTheta)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-float3 fresnelSchlickRoughness(float3 F0, float cosTheta, float roughness)
+float3 fresnelGGX(float3 F0, float3 normal, float3 viewRelativeDir, float roughness)
 {
-	return F0 + max(0.0, (1.0 - roughness) - F0) * pow(1.0 - cosTheta, 5.0);
+    float NDotV = max(dot(normal, viewRelativeDir), 0.0);
+    float alpha = roughness * roughness;
+    float k = alpha / 2.0;
+    float k2 = k * k;
+    float nom = NDotV;
+    float denom = NDotV * (1.0 - k2) + k2;
+    float specular = nom / denom;
+    return F0 + (1.0 - F0) * pow(1.0 - NDotV, 5.0) * (1.0 - specular);
 }
+
 
 // GGX/Towbridge-Reitz normal distribution function
 // Uses Disney's reparametrization of alpha = roughness^2
@@ -92,6 +101,11 @@ float GetAttenForLight(float4 lightAtten, int lightNum)
     return lightAtten.x;
 }
 
+
+
+
+
+
 // Calculate direct light for one source
 float3 calculateLight(float3 lightIn, float3 lightIntensity, float3 lightOut, float3 normal, float3 fresnelReflectance, float roughness, float metalness, float lightDirectionAngle, float3 albedo)
 {
@@ -124,8 +138,24 @@ float3 calculateLight(float3 lightIn, float3 lightIntensity, float3 lightOut, fl
     // Diffuse scattering happens due to light being refracted multiple times by a dielectric medium
     // Metals on the other hand either reflect or absorb energso diffuse contribution is always, zero
     // To be energy conserving we must scale diffuse BRDF contribution based on Fresnel factor & metalness
-    float3 kd = lerp((float3(1, 1, 1) - F2 ) * (float3(1, 1, 1) - F3 ), float3(0, 0, 0), metalness);
-    float3 diffuseBRDF = kd * albedo;
+    //float3 kd = lerp((float3(1, 1, 1) - F2 ) * (float3(1, 1, 1) - F3 ), float3(0, 0, 0), metalness);
+    float3 diffuseBRDF = albedo * (1.0 - metalness) * (1.0 - fresnelSchlick(fresnelReflectance, max(0.0, dot(normal, lightOut))));
+
+    float3 L = lightIntensity * cosLightIn;
+
+    float theta_i = acos(max(0.0, dot(lightIn, normal)));
+    float theta_r = acos(max(0.0, dot(lightOut, normal)));
+    float alpha = max(theta_i, theta_r);
+    float beta = min(theta_i, theta_r);
+    float sigma = roughness * roughness;
+
+    float A = 1.0 - 0.5 * (sigma / (sigma + 0.33));
+    float B = 0.45 * (sigma / (sigma + 0.09));
+
+    diffuseBRDF *= (A + B * max(0.0, dot(lightIn, lightOut)) * sin(alpha) * tan(beta));
+
+    diffuseBRDF * L;
+
     return (diffuseBRDF + specularBRDF) * lightIntensity * cosLightIn;
 
 #endif // LIGHTMAPPED && !FLASHLIGHT

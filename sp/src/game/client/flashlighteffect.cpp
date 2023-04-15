@@ -434,19 +434,19 @@ void CFlashlightEffect::UpdateLightOld(const Vector &vecPos, const Vector &vecDi
 //-----------------------------------------------------------------------------
 // Purpose: Do the headlight
 //-----------------------------------------------------------------------------
-void CFlashlightEffect::UpdateLight(const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, int nDistance)
+void CFlashlightEffect::UpdateLight(const Vector& vecPos, const Vector& vecDir, const Vector& vecRight, const Vector& vecUp, int nDistance)
 {
-	if ( !m_bIsOn )
+	if (!m_bIsOn)
 	{
 		return;
 	}
-	if( r_newflashlight.GetBool() )
+	if (r_newflashlight.GetBool())
 	{
-		UpdateLightNew( vecPos, vecDir, vecRight, vecUp );
+		UpdateLightNew(vecPos, vecDir, vecRight, vecUp);
 	}
 	else
 	{
-		UpdateLightOld( vecPos, vecDir, nDistance );
+		UpdateLightOld(vecPos, vecDir, nDistance);
 	}
 }
 

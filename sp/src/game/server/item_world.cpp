@@ -177,7 +177,7 @@ void CItem::Spawn( void )
 	// against other items + weapons
 	SetCollisionGroup( COLLISION_GROUP_WEAPON );
 	CollisionProp()->UseTriggerBounds( true, ITEM_PICKUP_BOX_BLOAT );
-	SetTouch(&CItem::ItemTouch);
+	//SetTouch(&CItem::ItemTouch);
 
 	if ( CreateItemVPhysicsObject() == false )
 		return;
@@ -227,7 +227,7 @@ void CItem::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType
 
 	if ( pPlayer )
 	{
-		pPlayer->PickupObject( this );
+		ItemTouch(pPlayer);
 	}
 }
 
@@ -521,7 +521,7 @@ void CItem::Materialize( void )
 		DoMuzzleFlash();
 	}
 
-	SetTouch( &CItem::ItemTouch );
+	//SetTouch( &CItem::ItemTouch );
 }
 
 //-----------------------------------------------------------------------------

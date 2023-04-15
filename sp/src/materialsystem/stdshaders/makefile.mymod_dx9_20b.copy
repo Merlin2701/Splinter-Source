@@ -1,0 +1,12 @@
+ssao_unsharp_ps2x.fxc-----ssao_unsharp_ps20
+ssao_unsharp_ps2x.fxc-----ssao_unsharp_ps20b
+ssao_final_ps2x.fxc-----ssao_final_ps20
+ssao_final_ps2x.fxc-----ssao_final_ps20b
+ssao_blury_vs20.fxc-----ssao_blury_vs20
+ssao_blury_ps2x.fxc-----ssao_blury_ps20
+ssao_blury_ps2x.fxc-----ssao_blury_ps20b
+ssao_blurx_vs20.fxc-----ssao_blurx_vs20
+ssao_blurx_ps2x.fxc-----ssao_blurx_ps20
+ssao_blurx_ps2x.fxc-----ssao_blurx_ps20b
+pbr_vs20b.fxc-----pbr_vs20b
+pbr_ps20b.fxc-----pbr_ps20b

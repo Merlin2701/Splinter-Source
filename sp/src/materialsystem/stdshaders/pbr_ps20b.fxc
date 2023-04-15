@@ -177,7 +177,8 @@ float4 main(PS_INPUT i) : COLOR
 
     // Start ambient
     float3 diffuseIrradiance = ambientLookup(normal, cAmbientCube, textureNormal, i.lightmapTexCoord1And2, i.lightmapTexCoord3, LightmapSampler, modul);
-    float3 ambientLightingFresnelTerm = fresnelSchlickRoughness(fresnelReflectance, lightDirectionAngle, roughness); // F
+    float3 ambientLightingFresnelTerm = fresnelGGX(fresnelReflectance, normal, outgoingLightDirection, roughness);
+
 
     float3 diffuseContributionFactor = lerp(1 - ambientLightingFresnelTerm, 0, metalness); ; // kd
     float3 diffuseIBL = diffuseContributionFactor * albedo.rgb * diffuseIrradiance;

@@ -15,6 +15,10 @@
 #include "coordsize.h"
 #include "rumble_shared.h"
 
+#include "mathlib/mathlib.h"
+#include "mathlib/vector.h"
+#include "mathlib/ssemath.h"
+
 #if defined(HL2_DLL) || defined(HL2_CLIENT_DLL)
 	#include "hl_movedata.h"
 #endif
@@ -67,6 +71,12 @@ ConVar debug_latch_reset_onduck( "debug_latch_reset_onduck", "1", FCVAR_CHEAT );
 
 // [MD] I'll remove this eventually. For now, I want the ability to A/B the optimizations.
 bool g_bMovementOptimizations = true;
+
+// Camera Bob
+ConVar cl_viewbob_enabled("cl_viewbob_enabled", "1", 0, "Oscillation Toggle");
+ConVar cl_viewbob_timer("cl_viewbob_timer", "10", 0, "Speed of Oscillation");
+ConVar cl_viewbob_scale("cl_viewbob_scale", "0.05", 0, "Magnitude of Oscillation");
+ConVar cl_viewbob_breathing_scale("cl_viewbob_breathing_scale", "0.01", 0, "Magnitude of Breathing Effect");
 
 // Roughly how often we want to update the info about the ground surface we're on.
 // We don't need to do this very often.
@@ -1918,6 +1928,45 @@ void CGameMovement::WalkMove( void )
 	// Copy movement amounts
 	fmove = mv->m_flForwardMove;
 	smove = mv->m_flSideMove;
+
+
+
+
+	if (cl_viewbob_enabled.GetBool() && !engine->IsPaused())
+	{
+		float speed = player->GetAbsVelocity().Length();
+		float time = gpGlobals->curtime;
+
+		// Fine-tune these parameters for the desired realistic bobbing effect
+		float x_frequency1 = 2.0f;
+		float x_frequency2 = 7.0f;
+		float x_amplitude1 = cl_viewbob_scale.GetFloat() / 100;
+		float x_amplitude2 = cl_viewbob_scale.GetFloat() / 200;
+
+		float y_frequency1 = 4.0f;
+		float y_frequency2 = 11.0f;
+		float y_amplitude1 = cl_viewbob_scale.GetFloat() / 400;
+		float y_amplitude2 = cl_viewbob_scale.GetFloat() / 800;
+
+		// Parameters for the breathing effect
+		float breathing_frequency = 0.5f;
+		float breathing_amplitude = cl_viewbob_breathing_scale.GetFloat();
+
+		float xoffset = 0.0f;
+		float yoffset = 0.0f;
+
+		// Calculate the breathing effect
+		yoffset += sin(time * breathing_frequency) * breathing_amplitude;
+
+		// Calculate the camera bob effect only if the player is moving
+		if (speed > 0.1f) {
+			xoffset += (sin(time * x_frequency1 * cl_viewbob_timer.GetFloat()) * x_amplitude1 + sin(time * x_frequency2 * cl_viewbob_timer.GetFloat()) * x_amplitude2) * speed;
+			yoffset += (sin(time * y_frequency1 * cl_viewbob_timer.GetFloat()) * y_amplitude1 + sin(time * y_frequency2 * cl_viewbob_timer.GetFloat()) * y_amplitude2) * speed;
+		}
+
+		player->ViewPunch(QAngle(xoffset, yoffset, 0));
+	}
+
 
 	// Zero out z components of movement vectors
 	if ( g_bMovementOptimizations )
