@@ -524,32 +524,40 @@ void CBaseViewModel::CalcViewModelView( CBasePlayer *owner, const Vector& eyePos
 
 }
 
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 float g_fMaxViewModelLag = 1.5f;
-
-void CBaseViewModel::CalcViewModelLag( Vector& origin, QAngle& angles, QAngle& original_angles )
+Vector LerpVector(const Vector& start, const Vector& end, float fraction)
 {
+	return start + (end - start) * fraction;
+}
+
+void CBaseViewModel::CalcViewModelLag(Vector& origin, QAngle& angles, QAngle& original_angles)
+{
+
+
 	Vector vOriginalOrigin = origin;
 	QAngle vOriginalAngles = angles;
 
 	// Calculate our drift
-	Vector	forward;
-	AngleVectors( angles, &forward, NULL, NULL );
+	Vector forward, right, up;
+	AngleVectors(angles, &forward, &right, &up);
 
-	if ( gpGlobals->frametime != 0.0f )
+
+	if (gpGlobals->frametime != 0.0f)
 	{
 		Vector vDifference;
-		VectorSubtract( forward, m_vecLastFacing, vDifference );
+		VectorSubtract(forward, m_vecLastFacing, vDifference);
 
 		float flSpeed = 5.0f;
 
 #ifdef MAPBASE
-		CBaseCombatWeapon *pWeapon = m_hWeapon.Get();
+		CBaseCombatWeapon* pWeapon = m_hWeapon.Get();
 		if (pWeapon)
 		{
-			const FileWeaponInfo_t *pInfo = &pWeapon->GetWpnData();
+			const FileWeaponInfo_t* pInfo = &pWeapon->GetWpnData();
 			if (pInfo->m_flSwayScale != 1.0f)
 			{
 				vDifference *= pInfo->m_flSwayScale;
@@ -565,41 +573,59 @@ void CBaseViewModel::CalcViewModelLag( Vector& origin, QAngle& angles, QAngle& o
 		// If we start to lag too far behind, we'll increase the "catch up" speed.  Solves the problem with fast cl_yawspeed, m_yaw or joysticks
 		//  rotating quickly.  The old code would slam lastfacing with origin causing the viewmodel to pop to a new position
 		float flDiff = vDifference.Length();
-		if ( (flDiff > g_fMaxViewModelLag) && (g_fMaxViewModelLag > 0.0f) )
+		if ((flDiff > g_fMaxViewModelLag) && (g_fMaxViewModelLag > 0.0f))
 		{
 			float flScale = flDiff / g_fMaxViewModelLag;
 			flSpeed *= flScale;
 		}
 
-		// FIXME:  Needs to be predictable?
-		VectorMA( m_vecLastFacing, flSpeed * gpGlobals->frametime, vDifference, m_vecLastFacing );
-		// Make sure it doesn't grow out of control!!!
-		VectorNormalize( m_vecLastFacing );
-		VectorMA( origin, 2.0f, vDifference * -1.0f, origin );
 
-		Assert( m_vecLastFacing.IsValid() );
+		VectorMA(m_vecLastFacing, flSpeed * gpGlobals->frametime, vDifference, m_vecLastFacing);
+		VectorNormalize(m_vecLastFacing);
+		VectorMA(origin, 2.0f, vDifference * -1.0f, origin);
 	}
 
-	Vector right, up;
-	AngleVectors( original_angles, &forward, &right, &up );
-
-	float pitch = original_angles[ PITCH ];
-	if ( pitch > 180.0f )
+	float pitch = original_angles[PITCH];
+	if (pitch > 180.0f)
 		pitch -= 360.0f;
-	else if ( pitch < -180.0f )
+	else if (pitch < -180.0f)
 		pitch += 360.0f;
 
-	if ( g_fMaxViewModelLag == 0.0f )
+	if (g_fMaxViewModelLag == 0.0f)
 	{
 		origin = vOriginalOrigin;
 		angles = vOriginalAngles;
 	}
 
-	//FIXME: These are the old settings that caused too many exposed polys on some models
-	VectorMA( origin, -pitch * 0.035f,	forward,	origin );
-	VectorMA( origin, -pitch * 0.03f,		right,	origin );
-	VectorMA( origin, -pitch * 0.02f,		up,		origin);
+	// Updated sway scales for front and back of the gun
+	float frontSwayScale = 0.015f;
+	float backSwayScale = 0.035f;
+
+	// Apply sway effect using matrix manipulation
+	matrix3x4_t viewModelMatrix;
+	AngleMatrix(angles, origin, viewModelMatrix);
+
+	Vector frontOffset = forward * (-pitch * frontSwayScale);
+	Vector backOffset = (right + up) * (-pitch * backSwayScale);
+
+	// Modify the translation column of the viewModelMatrix
+	for (int i = 0; i < 3; ++i)
+	{
+		viewModelMatrix[i][3] += (frontOffset[i] + backOffset[i]);
+	}
+
+	MatrixAngles(viewModelMatrix, angles, origin);
+
+
+
 }
+
+
+
+
+
+
+
 
 //-----------------------------------------------------------------------------
 // Stub to keep networking consistent for DEM files

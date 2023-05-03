@@ -38,6 +38,7 @@
 #include "ienginevgui.h"
 #include "viewpostprocess.h"
 #include "sourcevr/isourcevirtualreality.h"
+#include "hud_itemname.h"
 #if defined( _X360 )
 #include "xbox/xbox_console.h"
 #endif
@@ -582,6 +583,40 @@ void ClientModeShared::AdjustEngineViewport( int& x, int& y, int& width, int& he
 //-----------------------------------------------------------------------------
 void ClientModeShared::PreRender( CViewSetup *pSetup )
 {
+/*	trace_t tr;
+	C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
+	if (pPlayer)
+	{
+		Vector vecStart, vecEnd, vecForward;
+		pPlayer->EyeVectors(&vecForward);
+		vecStart = pPlayer->EyePosition();
+		vecEnd = vecStart + vecForward * MAX_TRACE_LENGTH;
+
+		UTIL_TraceLine(vecStart, vecEnd, MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &tr);
+
+		CHudItemName* pHudItemName = GET_HUDELEMENT(CHudItemName);
+		if (tr.DidHitNonWorldEntity() && tr.m_pEnt && tr.m_pEnt->GetClientClass())
+		{
+			// Assuming the item's name is stored in the entity's targetname field
+			const char* pszItemName = tr.m_pEnt->GetEntityName();
+
+			wchar_t wszItemName[128];
+
+			if (pszItemName)
+			{
+				g_pVGuiLocalize->ConvertANSIToUnicode(pszItemName, wszItemName, sizeof(wszItemName));
+				pHudItemName->SetItemName(wszItemName);
+			}
+			else
+			{
+				pHudItemName->SetItemName(NULL);
+			}
+		}
+		else
+		{
+			pHudItemName->SetItemName(NULL);
+		}
+	} */
 }
 
 //-----------------------------------------------------------------------------
