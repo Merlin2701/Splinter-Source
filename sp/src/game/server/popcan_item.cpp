@@ -15,6 +15,10 @@
 #include "player.h"
 #include "datamap.h" // Add this line
 // Add this line
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 PRECACHE_REGISTER(item_popcan);
 
 BEGIN_DATADESC(CPopCanItem)
