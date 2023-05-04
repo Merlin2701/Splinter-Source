@@ -161,6 +161,21 @@ public:
 	}
 };
 
+
+
+
+
+// Add a new member variable to the class to store the previous orientation
+Quaternion m_prevQuatOrientation;
+
+// Add a new member variable to the class to store the previous origin
+Vector m_prevVecLightOrigin;
+
+// Add new constants to the class or global scope to control the smoothing factor
+const float LERP_FACTOR_POSITION = 0.1f; // Smaller value makes the position lag more
+const float LERP_FACTOR_ORIENTATION = 0.1f; // Smaller value makes the orientation lag more
+
+
 //-----------------------------------------------------------------------------
 // Purpose: Do the headlight
 //-----------------------------------------------------------------------------
@@ -352,6 +367,21 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	state.m_flShadowSlopeScaleDepthBias = mat_slopescaledepthbias_shadowmap.GetFloat();
 	state.m_flShadowDepthBias = mat_depthbias_shadowmap.GetFloat();
 
+
+
+
+
+
+	// Smoothly interpolate the flashlight position and orientation
+	VectorLerp(m_prevVecLightOrigin, state.m_vecLightOrigin, LERP_FACTOR_POSITION, state.m_vecLightOrigin);
+	QuaternionSlerp(m_prevQuatOrientation, state.m_quatOrientation, LERP_FACTOR_ORIENTATION, state.m_quatOrientation);
+
+	// Store the current position and orientation for the next frame
+	m_prevVecLightOrigin = state.m_vecLightOrigin;
+	m_prevQuatOrientation = state.m_quatOrientation;
+
+
+
 	if( m_FlashlightHandle == CLIENTSHADOW_INVALID_HANDLE )
 	{
 		m_FlashlightHandle = g_pClientShadowMgr->CreateFlashlight( state );
@@ -541,6 +571,12 @@ void CHeadlightEffect::UpdateLight( const Vector &vecPos, const Vector &vecDir, 
 	state.m_pSpotlightTexture = m_FlashlightTexture;
 	state.m_nSpotlightTextureFrame = 0;
 	
+
+
+
+
+
+
 	if( GetFlashlightHandle() == CLIENTSHADOW_INVALID_HANDLE )
 	{
 		SetFlashlightHandle( g_pClientShadowMgr->CreateFlashlight( state ) );
